@@ -2,12 +2,21 @@ const express = require('express');
 
 const router = express.Router();
 const UserService = require('../services/user_service');
+const HTTPReqParamError = require('../error/http_request_param_error');
 
 /* GET users listing. */
 router.get('/', (req, res) => {
-    const users = UserService.getAllUsers();
-    res.locals.users = users;
-    res.render('users');
+    (async () => {
+        throw new HTTPReqParamError('page', '请指定页面', 'page can not be empty')
+        const users = await UserService.getAllUsers();
+        res.locals.users = users;
+    })()
+    .then(() => {
+        res.render('users');
+    })
+    .catch((e) => {
+        console.log(e)
+    })
 });
 
 router.post('/', (req, res) => {
